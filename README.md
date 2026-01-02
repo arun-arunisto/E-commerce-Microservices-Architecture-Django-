@@ -1,11 +1,5 @@
 # 🛒 E-Commerce Microservices Architecture (Django)
 
-![Image](https://miro.medium.com/0%2AxuHRipbS0io0EYVl.png)
-
-![Image](https://i.imgur.com/sZZgEwq.jpg)
-
-![Image](https://hazelcast.com/wp-content/uploads/2024/04/glossary-eda.svg)
-
 A **production-style e-commerce backend** built using **Django** and **Django REST Framework**, following **true microservices architecture principles**.
 
 This project demonstrates:
@@ -28,7 +22,7 @@ Most “microservices” demos:
 * Live inside one Django project ❌
 * Use sync calls for everything ❌
 
-This project exists to show **how microservices should actually be designed**, even at a small scale.
+This project aims to demonstrate **how microservices should be designed**, even at a small scale.
 
 ---
 
