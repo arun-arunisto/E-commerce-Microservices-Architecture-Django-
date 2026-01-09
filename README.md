@@ -193,7 +193,7 @@ By building this project, you will understand:
 ## ⚠️ Disclaimer (Honest One)
 
 This architecture is **intentionally complex**.
-If you’re building a startup MVP — **don’t use this**.
+If you’re building a startup MVP, **don’t use this**.
 This project is for **learning, architecture practice, and senior-level interviews**.
 
 ---
