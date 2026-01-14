@@ -44,7 +44,7 @@ Auth Service (Django + DRF + JWT)
 
 ## Tech Stack
 
-* Python 3.11
+* Python 3
 * Django
 * Django REST Framework
 * SimpleJWT
