@@ -4,32 +4,42 @@ services:
   auth-service:
     build: ./auth-service
     container_name: auth-service
-    ports:
-      - "9000:9000"
+    volumes:
+      - auth_db:/app/data
+    expose:
+      - "9000"
   
   catalog-service:
     build: ./catalog-service
     container_name: catalog-service
-    ports:
-      - "9001:9001"
+    volumes:
+      - catalog_db:/app/data
+    expose:
+      - "9001"
   
   order-service:
     build: ./order-service
     container_name: order-service
-    ports:
-      - "9002:9002"
+    volumes:
+      - order_db:/app/data
+    expose:
+      - "9002"
   
   notification-service:
     build: ./notification-service
     container_name: notification-service
-    ports:
-      - "9003:9003"
+    volumes:
+      - notification_db:/app/data
+    expose:
+      - "9003"
   
   payment-service:
     build: ./payment-service
     container_name: payment-service
-    ports:
-      - "9004:9004"
+    volumes:
+      - payment_db:/app/data
+    expose:
+      - "9004"
 
   api-gateway:
     image: nginx:latest
@@ -44,3 +54,10 @@ services:
       - order-service
       - notification-service
       - payment-service
+
+volumes:
+  auth_db:
+  catalog_db:
+  order_db:
+  notification_db:
+  payment_db:

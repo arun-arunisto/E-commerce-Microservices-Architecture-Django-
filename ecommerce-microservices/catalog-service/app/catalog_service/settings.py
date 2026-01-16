@@ -20,12 +20,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=j95yk9*jhv%#hh$tzpv*i41^2hn9j5y5cudtk%y)^bokf4j!8'
+SECRET_KEY = "SUPER_SECRET_JWT_KEY_CHANGE_ME"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "catalog-service",
+]
 
 
 # Application definition
@@ -77,7 +81,7 @@ WSGI_APPLICATION = 'catalog_service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / "data" / "db.sqlite3",
     }
 }
 
@@ -104,8 +108,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # REST Framework and JWT Configuration
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "USER_ID_CLAIM": "user_id",
 }
 
 # Internationalization
