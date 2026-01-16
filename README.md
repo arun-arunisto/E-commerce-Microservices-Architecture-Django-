@@ -27,7 +27,7 @@ This repository exists to demonstrate:
 * Centralized authentication with distributed trust
 * Stateless JWT in microservices
 * Dockerized services that survive restarts
-* How things actually break — and how to fix them
+* How things actually break and how to fix them
 
 ---
 
@@ -173,14 +173,17 @@ ecommerce-microservices/
 │
 ├── order-service/
 │   ├── app/
+│   ├── README.md
 │   └── Dockerfile
 │
 ├── payment-service/
 │   ├── app/
+│   ├── README.md
 │   └── Dockerfile
 │
 ├── notification-service/
 │   ├── app/
+│   ├── README.md
 │   └── Dockerfile
 │
 ├── docker-compose.yml
