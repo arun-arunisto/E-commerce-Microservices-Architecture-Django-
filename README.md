@@ -288,5 +288,7 @@ This architecture is **intentionally not beginner-friendly**.
 ## 👤 Author
 
 **Arun Arunisto**
+
 Senior Python Engineer
+
 Focus: Backend Architecture, Django, Distributed Systems
