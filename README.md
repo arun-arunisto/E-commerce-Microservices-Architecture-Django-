@@ -1,28 +1,33 @@
-# 🛒 E-Commerce Microservices Architecture (Django)
+# 🛒 E-Commerce Microservices (Django + Docker)
 
-A **production-style e-commerce backend** built using **Django** and **Django REST Framework**, following **true microservices architecture principles**.
+A **production-oriented e-commerce backend** built using **Django** and **Django REST Framework**, following **true microservices architecture principles**.
 
-This project demonstrates:
+Each service is:
 
-* Clear service boundaries
-* Independent deployments
-* Event-driven communication
-* API Gateway pattern
-* No shared databases
+* Independently deployable
+* Owns its own database
+* Isolated behind an API Gateway
+* Authenticated using **stateless JWT**
 
-> ⚠️ This is **not** a distributed monolith. Each service is isolated by design.
+This project focuses on **correct architecture, service isolation, and real-world failure handling**, not shortcuts.
 
 ---
 
-## 📌 Why This Project?
+## 📌 Purpose of This Project
 
-Most “microservices” demos:
+Most “microservices” examples online:
 
-* Share a database ❌
-* Live inside one Django project ❌
-* Use sync calls for everything ❌
+* Share databases ❌
+* Depend on Django’s monolith assumptions ❌
+* Skip real auth boundaries ❌
 
-This project aims to demonstrate **how microservices should be designed**, even at a small scale.
+This repository exists to demonstrate:
+
+* Proper service boundaries
+* Centralized authentication with distributed trust
+* Stateless JWT in microservices
+* Dockerized services that survive restarts
+* How things actually break — and how to fix them
 
 ---
 
@@ -41,50 +46,142 @@ This project aims to demonstrate **how microservices should be designed**, even 
 
 ---
 
-## 🔄 Communication Model
-
-### Synchronous (HTTP)
-
-* Token validation
-* Product price checks
-
-### Asynchronous (Events)
-
-* Order creation
-* Payment confirmation
-* Notifications
-
-Event-driven communication is handled via **RabbitMQ**.
+All external traffic flows through the **API Gateway**.
+Internal services are **never accessed directly**.
 
 ---
 
-## 🗂 Repository Structure
+## 🧩 Services (What Exists Today)
+
+### 🔐 Auth Service
+
+Responsible for **authentication and identity**.
+
+* Custom Django user model
+* Email/password authentication
+* Issues JWT access & refresh tokens
+* Single source of truth for identity
+
+📁 `auth-service/`
+📄 `auth-service/README.md`
+
+---
+
+### 🛒 Catalog Service
+
+Responsible for **product management**.
+
+* Product CRUD APIs
+* Public read endpoints
+* JWT-protected write endpoints
+* Stateless JWT validation (no user DB access)
+
+📁 `catalog-service/`
+📄 `catalog-service/README.md`
+
+---
+
+### 📦 Order Service
+
+Responsible for **order management (Phase 1 bootstrap)**.
+
+* Independent Django service
+* Health check endpoint implemented
+* Service isolation validated
+* No business logic yet (by design)
+
+📁 `order-service/`
+
+---
+
+### 💳 Payment Service
+
+Responsible for **payment processing (Phase 1 bootstrap)**.
+
+* Independent Django service
+* Health check endpoint implemented
+* No payment provider integration yet
+* Exists to validate service lifecycle & routing
+
+📁 `payment-service/`
+
+---
+
+### 🔔 Notification Service
+
+Responsible for **notifications (Phase 1 bootstrap)**.
+
+* Independent Django service
+* Health check endpoint implemented
+* Future home for email / SMS / async events
+
+📁 `notification-service/`
+
+---
+
+### 🌐 API Gateway
+
+Single public entry point for all services.
+
+* NGINX reverse proxy
+* Path-based routing:
+
+  * `/auth/`
+  * `/catalog/`
+  * `/orders/`
+  * `/payments/`
+  * `/notifications/`
+* No business logic
+* No authentication logic
+
+📁 `api-gateway/`
+
+---
+
+## 🔐 Authentication Model
+
+* **Auth Service** issues JWTs
+* All other services validate JWT **statelessly**
+* No service (except Auth) touches user tables
+* Trust is established via a shared signing secret
+
+This prevents:
+
+* Shared databases
+* User duplication
+* Tight coupling
+
+---
+
+## 🗂 Repository Structure (Updated)
 
 ```
 ecommerce-microservices/
 ├── api-gateway/
-│   └── nginx.conf
+│   └── nginx/
+│       └── nginx.conf
 │
 ├── auth-service/
+│   ├── app/
 │   ├── Dockerfile
-│   ├── requirements.txt
-│   └── auth_service/
+│   └── README.md
 │
 ├── catalog-service/
+│   ├── app/
 │   ├── Dockerfile
-│   └── catalog_service/
+│   └── README.md
 │
 ├── order-service/
-│   ├── Dockerfile
-│   └── order_service/
+│   ├── app/
+│   └── Dockerfile
 │
 ├── payment-service/
-│   ├── Dockerfile
-│   └── payment_service/
+│   ├── app/
+│   └── Dockerfile
 │
 ├── notification-service/
-│   ├── Dockerfile
-│   └── notification_service/
+│   ├── app/
+│   └── Dockerfile
 │
 ├── docker-compose.yml
 └── README.md
@@ -94,107 +191,97 @@ Each service:
 
 * Is a **separate Django project**
 * Has its **own database**
-* Can be deployed **independently**
+* Can be started, stopped, or rebuilt independently
 
 ---
 
-## 🛠 Tech Stack
+## 🛠 Tech Stack (Current)
 
-| Layer         | Technology                    |
-| ------------- | ----------------------------- |
-| Backend       | Django, Django REST Framework |
-| Database      | PostgreSQL (per service)      |
-| Messaging     | RabbitMQ                      |
-| API Gateway   | NGINX                         |
-| Containers    | Docker                        |
-| Orchestration | Kubernetes (planned)          |
-
----
-
-## 📦 Order Flow (Example)
-
-```
-Client
-  ↓
-API Gateway
-  ↓
-Order Service
-  ├─ validates JWT (Auth Service)
-  ├─ validates product (Catalog Service)
-  └─ creates order (PENDING)
-          ↓
-     OrderCreated Event
-          ↓
-     Payment Service
-          ↓
-   PaymentSuccess Event
-          ↓
-     Order Service (CONFIRMED)
-          ↓
- Notification Service
-```
-
-This flow avoids tight coupling and allows services to fail independently.
+| Layer      | Technology                                  |
+| ---------- | ------------------------------------------- |
+| Backend    | Django, Django REST Framework               |
+| Auth       | SimpleJWT (stateless)                       |
+| Gateway    | NGINX                                       |
+| Containers | Docker, Docker Compose                      |
+| Database   | SQLite (per service, persisted via volumes) |
 
 ---
 
-## 🧪 Local Development (Docker)
+## 🧪 Running the System
 
 ```bash
-git clone https://github.com/your-username/ecommerce-microservices.git
-cd ecommerce-microservices
 docker-compose up --build
 ```
 
-Services will be available via the API Gateway:
+All APIs are accessed **only via the API Gateway**.
+
+Stopping services:
+
+```bash
+docker-compose down
+```
+
+Removing all persisted data (destructive):
+
+```bash
+docker-compose down -v
+```
+
+---
+
+## 🩺 Health Checks
+
+Each service exposes a health endpoint to validate:
+
+* Service startup
+* Routing via gateway
+* Independent lifecycle
+
+Example:
 
 ```
-/auth/*
-/catalog/*
-/orders/*
-/payments/*
+GET /catalog/health/
+GET /orders/health/
+GET /payments/health/
+GET /notifications/health/
 ```
 
 ---
 
-## 🔐 Security Model
+## 🧠 Design Principles
 
-* JWT issued by Auth Service
-* Gateway routes requests
-* Services trust gateway
-* No public DB access
-* No shared secrets
+This project enforces:
 
----
-
-## 🚀 Future Enhancements
-
-* Kubernetes deployment
-* Centralized logging
-* Distributed tracing
-* CI/CD pipelines
-* Rate limiting at the gateway
-* Circuit breakers
+* One service → one responsibility
+* Stateless authentication
+* Explicit configuration
+* No shared databases
+* Incremental complexity
 
 ---
 
-## 🎯 Learning Outcomes
+## 🚧 What’s Next (Planned)
 
-By building this project, you will understand:
+The following **will be implemented next**, not yet:
 
-* Why microservices are expensive
-* How async workflows work
-* Event-driven system design
-* Service isolation & ownership
-* Real-world backend architecture
+* Order business logic
+* Product-to-order validation
+* Payment workflows
+* Event-driven notifications
+* PostgreSQL per service
+* Observability & metrics
 
 ---
 
-## ⚠️ Disclaimer (Honest One)
+## ⚠️ Honest Disclaimer
 
-This architecture is **intentionally complex**.
-If you’re building a startup MVP, **don’t use this**.
-This project is for **learning, architecture practice, and senior-level interviews**.
+This architecture is **intentionally not beginner-friendly**.
+
+* ❌ Not an MVP template
+* ❌ Not a CRUD tutorial
+* ✅ A serious learning project
+* ✅ Suitable for backend architecture interviews
+* ✅ Suitable for senior-level discussion
 
 ---
 
