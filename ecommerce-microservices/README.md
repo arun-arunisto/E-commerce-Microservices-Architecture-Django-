@@ -1,3 +1,4 @@
+
 # 🛒 E-Commerce Microservices (Django + Docker)
 
 A **production-oriented e-commerce backend** built using **Django** and **Django REST Framework**, following **true microservices architecture principles**.
@@ -35,8 +36,8 @@ This repository exists to demonstrate:
 
 ### Core Services
 
-| Service                  | Responsibility                  |
-| ------------------------ | ------------------------------- |
+| Service                        | Responsibility                  |
+| ------------------------------ | ------------------------------- |
 | **Auth Service**         | User authentication, JWT tokens |
 | **Catalog Service**      | Product catalog & pricing       |
 | **Order Service**        | Order creation & lifecycle      |

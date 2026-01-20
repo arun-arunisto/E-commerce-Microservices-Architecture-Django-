@@ -25,7 +25,11 @@ SECRET_KEY = "SUPER_SECRET_JWT_KEY_CHANGE_ME"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "order-service"
+]
 
 
 # Application definition
@@ -37,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -103,10 +108,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # REST Framework and JWT Configuration
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
+    ),
 }
 
+SIMPLE_JWT = {
+    "USER_ID_CLAIM": "user_id",
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
